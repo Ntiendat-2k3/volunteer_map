@@ -12,8 +12,8 @@ function sanitizeUser(u) {
     email: u.email,
     name: u.name,
     role: u.role,
-    avatarUrl: u.avatarUrl,
-    provider: u.provider,
+    avatarUrl: u.avatarUrl ?? null,
+    provider: u.provider ?? "LOCAL",
   };
 }
 
@@ -32,11 +32,15 @@ async function register({ email, password, name }) {
   if (exists) throw ApiError.badRequest("Email đã tồn tại");
 
   const passwordHash = await bcrypt.hash(cleanPassword, SALT_ROUNDS);
+
   const user = await User.create({
     email: cleanEmail,
     name: name?.trim() || null,
     passwordHash,
     role: "VOLUNTEER",
+    provider: "LOCAL", // ✅ rõ ràng
+    avatarUrl: null,
+    googleId: null,
   });
 
   return sanitizeUser(user);
@@ -93,8 +97,9 @@ async function refresh(rawRefreshToken) {
   tokenRow.revokedAt = new Date();
   await tokenRow.save();
 
+  // ✅ lấy đủ field để FE hiển thị avatar/name/provider
   const user = await User.findByPk(userId, {
-    attributes: ["id", "email", "name", "role"],
+    attributes: ["id", "email", "name", "role", "avatarUrl", "provider"],
   });
   if (!user) throw ApiError.unauthorized("User not found");
 

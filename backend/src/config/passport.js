@@ -4,35 +4,65 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bcrypt = require("bcrypt");
 const { env } = require("./env");
 const { User } = require("../models");
+const { Op } = require("sequelize");
 
 function initPassport(passport) {
   // LOCAL
   passport.use(
     "local",
     new LocalStrategy(
-      { usernameField: "email", passwordField: "password", session: false },
-      async (email, password, done) => {
+      { usernameField: "login", passwordField: "password", session: false }, // ✅ đổi field thành "login"
+      async (login, password, done) => {
         try {
-          const cleanEmail = String(email || "")
-            .toLowerCase()
-            .trim();
-          const user = await User.findOne({ where: { email: cleanEmail } });
-          if (!user)
-            return done(null, false, {
-              message: "Email hoặc mật khẩu không đúng",
-            });
+          const cleanLogin = String(login || "").trim();
+          const cleanEmail = cleanLogin.toLowerCase();
 
-          // ✅ nếu user tạo từ Google -> không cho login local
+          // tìm theo email OR name (case-insensitive)
+          const users = await User.findAll({
+            where: {
+              [Op.or]: [
+                { email: cleanEmail },
+                { name: { [Op.iLike]: cleanLogin } }, // postgres iLike
+              ],
+            },
+            limit: 5,
+          });
+
+          if (!users.length) {
+            return done(null, false, {
+              message: "Tài khoản hoặc mật khẩu không đúng",
+            });
+          }
+
+          // nếu match theo name mà trùng nhiều user -> yêu cầu dùng email
+          const matchedByName = users.filter(
+            (u) => (u.name || "").toLowerCase() === cleanLogin.toLowerCase()
+          );
+          if (
+            matchedByName.length > 1 &&
+            !users.some((u) => u.email === cleanEmail)
+          ) {
+            return done(null, false, {
+              message: "Tên đăng nhập bị trùng, vui lòng dùng email",
+            });
+          }
+
+          // ưu tiên email match nếu có
+          const user = users.find((u) => u.email === cleanEmail) || users[0];
+
           if (!user.passwordHash) {
             return done(null, false, {
               message: "Tài khoản này đăng nhập bằng Google",
             });
           }
 
-          const ok = await bcrypt.compare(password, user.passwordHash);
+          const ok = await bcrypt.compare(
+            String(password || ""),
+            user.passwordHash
+          );
           if (!ok)
             return done(null, false, {
-              message: "Email hoặc mật khẩu không đúng",
+              message: "Tài khoản hoặc mật khẩu không đúng",
             });
 
           return done(null, {
@@ -41,9 +71,10 @@ function initPassport(passport) {
             name: user.name,
             role: user.role,
             avatarUrl: user.avatarUrl,
+            provider: user.provider,
           });
-        } catch (err) {
-          return done(err);
+        } catch (e) {
+          return done(e);
         }
       }
     )

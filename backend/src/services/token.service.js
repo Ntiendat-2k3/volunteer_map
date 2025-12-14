@@ -11,7 +11,11 @@ function signAccessToken(user) {
 }
 
 function signRefreshToken(user) {
-  return jwt.sign({ type: "refresh" }, env.jwt.refreshSecret, {
+  const jti = crypto.randomUUID
+    ? crypto.randomUUID()
+    : crypto.randomBytes(16).toString("hex");
+
+  return jwt.sign({ type: "refresh", jti }, env.jwt.refreshSecret, {
     subject: String(user.id),
     expiresIn: env.jwt.refreshExpires,
   });
@@ -29,9 +33,9 @@ function cookieOptions() {
   const isProd = env.nodeEnv === "production";
   return {
     httpOnly: true,
-    secure: isProd,
+    secure: isProd, // prod: true (https)
     sameSite: isProd ? "none" : "lax",
-    path: "/api/auth",
+    path: "/", // ✅ an toàn hơn "/api/auth"
     maxAge: env.jwt.refreshCookieMaxAgeMs,
   };
 }
@@ -41,7 +45,7 @@ function setRefreshCookie(res, refreshToken) {
 }
 
 function clearRefreshCookie(res) {
-  res.clearCookie(env.jwt.refreshCookieName, { path: "/api/auth" });
+  res.clearCookie(env.jwt.refreshCookieName, { path: "/" }); // ✅ match path
 }
 
 module.exports = {

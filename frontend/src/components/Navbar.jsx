@@ -1,19 +1,25 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { FiLogIn, FiUserPlus, FiLogOut } from "react-icons/fi";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const nav = useNavigate();
 
   const navClass = ({ isActive }) =>
     `navlink ${isActive ? "navlink-active" : "navlink-idle"}`;
 
-  const providerLabel = (p) => {
-    if (!p) return "LOCAL";
-    if (p === "GOOGLE") return "GOOGLE";
-    if (p === "LOCAL+GOOGLE") return "LOCAL+GOOGLE";
-    return p;
+  const displayName = user?.name?.trim() || user?.email || "Bạn";
+
+  const onLogout = async () => {
+    try {
+      await logout();
+      nav("/login");
+    } catch (e) {
+      toast.error(e?.response?.data?.message || "Logout failed");
+    }
   };
 
   return (
@@ -50,34 +56,30 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <div className="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 sm:flex">
+              {/* ✅ Avatar + Xin chào */}
+              <div className="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 sm:flex">
                 {user.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
                     alt="avatar"
-                    className="h-8 w-8 rounded-full border border-slate-200"
+                    className="h-9 w-9 rounded-full border border-slate-200"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-700">
-                    {(user.email || "U")[0]?.toUpperCase()}
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-700">
+                    {displayName[0]?.toUpperCase()}
                   </div>
                 )}
 
-                <div className="flex flex-col leading-tight">
-                  <span className="font-medium text-slate-900">
-                    {user.email}
-                  </span>
-                  <div className="mt-0.5 flex items-center gap-2">
-                    <span className="badge">{user.role}</span>
-                    <span className="badge">
-                      {providerLabel(user.provider)}
-                    </span>
+                <div className="leading-tight">
+                  <div className="text-xs text-slate-500">Xin chào,</div>
+                  <div className="text-sm font-semibold text-slate-900">
+                    {displayName}
                   </div>
                 </div>
               </div>
 
-              <button onClick={logout} className="btn btn-outline px-3 py-2">
+              <button onClick={onLogout} className="btn btn-outline px-3 py-2">
                 <FiLogOut /> Logout
               </button>
             </>

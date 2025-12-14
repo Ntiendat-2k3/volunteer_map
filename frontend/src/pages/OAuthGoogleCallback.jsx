@@ -1,19 +1,20 @@
-import React, { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function OAuthGoogleCallback() {
   const nav = useNavigate();
   const { refreshSession } = useAuth();
+  const ran = useRef(false);
 
   useEffect(() => {
+    if (ran.current) return;
+    ran.current = true;
+
     (async () => {
-      await refreshSession(); // lấy accessToken bằng refresh cookie
-      nav("/");
-    })().catch((e) => {
-      console.log("OAuth Google refresh failed:", e);
-      nav("/login?error=google");
-    });
+      await refreshSession({ silent: false });
+      nav("/", { replace: true });
+    })().catch(() => nav("/login?error=google", { replace: true }));
   }, [nav, refreshSession]);
 
   return (

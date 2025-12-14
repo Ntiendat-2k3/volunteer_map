@@ -27,6 +27,17 @@ http.interceptors.response.use(
   async (err) => {
     const original = err.config;
 
+    const url = original?.url || "";
+    const isAuthEndpoint =
+      url.includes("/auth/login") ||
+      url.includes("/auth/register") ||
+      url.includes("/auth/refresh") ||
+      url.includes("/auth/logout");
+
+    if (err.response?.status === 401 && isAuthEndpoint) {
+      throw err;
+    }
+
     if (err.response?.status === 401 && !original._retry) {
       original._retry = true;
 
