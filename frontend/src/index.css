@@ -1,0 +1,213 @@
+@import "tailwindcss";
+
+/* Theme tokens (vẫn dùng được bg-brand-600 nếu Tailwind đọc @theme) */
+@theme {
+  --color-brand-600: #0f172a;
+  --color-brand-700: #0b1220;
+}
+
+/* COMPONENT CLASSES - CSS thuần để chắc chắn hoạt động */
+@layer components {
+  .app-shell {
+    min-height: 100vh;
+    background: rgb(248 250 252);
+    color: rgb(15 23 42);
+  }
+
+  .container-app {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  /* Auth layout */
+  .auth-shell {
+    min-height: calc(100vh - 64px);
+    background: linear-gradient(
+      135deg,
+      rgb(248 250 252),
+      rgb(255 255 255),
+      rgb(241 245 249)
+    );
+  }
+
+  .auth-wrap {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: 2.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 28rem;
+  }
+
+  /* Card */
+  .card {
+    border: 1px solid rgb(226 232 240);
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06), 0 10px 28px rgba(2, 6, 23, 0.1);
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+  @media (min-width: 640px) {
+    .card-body {
+      padding: 1.75rem;
+    }
+  }
+
+  .divider {
+    margin: 1.25rem 0;
+    height: 1px;
+    width: 100%;
+    background: rgb(226 232 240);
+  }
+
+  .auth-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .auth-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 1rem;
+    background: var(--color-brand-600);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.12);
+  }
+
+  /* Labels */
+  .label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: rgb(51 65 85);
+  }
+
+  /* Icon input */
+  .input-wrap {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid rgb(226 232 240);
+    background: white;
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .input-wrap:focus-within {
+    border-color: rgb(148 163 184);
+  }
+
+  .input-plain {
+    width: 100%;
+    background: transparent;
+    outline: none;
+    color: rgb(15 23 42);
+  }
+
+  .input-plain::placeholder {
+    color: rgb(148 163 184);
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: background-color 0.2s ease, border-color 0.2s ease,
+      opacity 0.2s ease;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    opacity: 0.9;
+  }
+
+  .btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--color-brand-600);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: var(--color-brand-700);
+  }
+
+  .btn-outline {
+    background: white;
+    color: rgb(51 65 85);
+    border: 1px solid rgb(226 232 240);
+  }
+  .btn-outline:hover {
+    background: rgb(248 250 252);
+  }
+
+  /* Nav */
+  .navlink {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .navlink-idle {
+    color: rgb(51 65 85);
+  }
+  .navlink-idle:hover {
+    background: rgb(241 245 249);
+  }
+
+  .navlink-active {
+    background: var(--color-brand-600);
+    color: white;
+  }
+
+  .badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgb(241 245 249);
+    color: rgb(15 23 42);
+  }
+
+  /* Alerts */
+  .alert {
+    border: 1px solid;
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  .alert-error {
+    border-color: rgb(254 202 202);
+    background: rgb(254 242 242);
+    color: rgb(185 28 28);
+  }
+  .alert-success {
+    border-color: rgb(167 243 208);
+    background: rgb(236 253 245);
+    color: rgb(6 95 70);
+  }
+}
