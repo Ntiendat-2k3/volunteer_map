@@ -39,6 +39,10 @@ const env = {
     force: String(process.env.DB_SYNC_FORCE || "false") === "true",
     alter: String(process.env.DB_SYNC_ALTER || "true") === "true",
   },
+  geo: {
+    userAgent: process.env.GEO_USER_AGENT,
+  },
+  frontendUrl: process.env.FRONTEND_URL,
 };
 
 env.jwt.refreshCookieMaxAgeMs = parseDurationMs(

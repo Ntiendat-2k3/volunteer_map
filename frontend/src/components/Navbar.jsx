@@ -1,7 +1,14 @@
 import React from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { FiLogIn, FiUserPlus, FiLogOut } from "react-icons/fi";
+import {
+  FiLogIn,
+  FiUserPlus,
+  FiLogOut,
+  FiPlus,
+  FiMapPin,
+  FiGrid,
+} from "react-icons/fi";
 import toast from "react-hot-toast";
 
 export default function Navbar() {
@@ -37,8 +44,34 @@ export default function Navbar() {
 
         <nav className="ml-4 hidden items-center gap-2 sm:flex">
           <NavLink to="/" className={navClass}>
-            Home
+            <span className="inline-flex items-center gap-2">
+              <FiMapPin /> Bản đồ
+            </span>
           </NavLink>
+
+          {user && (
+            <>
+              <NavLink to="/posts/new" className={navClass}>
+                <span className="inline-flex items-center gap-2">
+                  <FiPlus /> Tạo điểm
+                </span>
+              </NavLink>
+
+              <NavLink to="/posts/mine" className={navClass}>
+                <span className="inline-flex items-center gap-2">
+                  <FiGrid /> Bài của tôi
+                </span>
+              </NavLink>
+
+              {user.role === "ADMIN" && (
+                <NavLink to="/admin" className={navClass}>
+                  <span className="inline-flex items-center gap-2">
+                    <FiGrid /> Dashboard
+                  </span>
+                </NavLink>
+              )}
+            </>
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
@@ -56,7 +89,6 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              {/* ✅ Avatar + Xin chào */}
               <div className="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 sm:flex">
                 {user.avatarUrl ? (
                   <img

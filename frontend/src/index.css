@@ -210,4 +210,71 @@
     background: rgb(236 253 245);
     color: rgb(6 95 70);
   }
+
+  .map-box {
+    border: 1px solid rgb(226 232 240);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    height: 420px;
+  }
+
+  .map-inner {
+    height: 100%;
+    width: 100%;
+  }
+
+  .post-card {
+    display: block;
+    border: 1px solid rgb(226 232 240);
+    border-radius: 1.25rem;
+    padding: 0.9rem;
+    background: white;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .post-card:hover {
+    background: rgb(248 250 252);
+    border-color: rgb(203 213 225);
+  }
+
+  .chip {
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: 1px solid rgb(226 232 240);
+    background: white;
+    color: rgb(51 65 85);
+    cursor: pointer;
+  }
+  .chip-on {
+    background: var(--color-brand-600);
+    border-color: var(--color-brand-600);
+    color: white;
+  }
+  .chip-off:hover {
+    background: rgb(248 250 252);
+  }
+
+  /* Table (Admin) */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgb(226 232 240);
+  }
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgb(226 232 240);
+    font-size: 0.875rem;
+    vertical-align: top;
+  }
+  .table th {
+    text-align: left;
+    background: rgb(248 250 252);
+    font-weight: 800;
+    color: rgb(51 65 85);
+  }
 }

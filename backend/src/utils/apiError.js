@@ -13,5 +13,8 @@ class ApiError extends Error {
   static forbidden(msg = "Forbidden", details) {
     return new ApiError(403, msg, details);
   }
+  static notFound(msg = "Not Found", details) {
+    return new ApiError(404, msg, details);
+  }
 }
 module.exports = { ApiError };
