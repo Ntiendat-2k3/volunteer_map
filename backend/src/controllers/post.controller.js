@@ -35,10 +35,26 @@ const getById = asyncHandler(async (req, res) => {
 
 const update = asyncHandler(async (req, res) => {
   const post = await postService.updatePost(req.post, req.body);
-  return ok(res, {
-    post,
-    message: "Đã cập nhật. Bài quay về trạng thái chờ duyệt.",
-  });
+
+  const contentKeys = [
+    "title",
+    "description",
+    "address",
+    "lat",
+    "lng",
+    "needTags",
+    "contactName",
+    "contactPhone",
+  ];
+  const contentChanged = contentKeys.some((k) => req.body?.[k] !== undefined);
+
+  const message = contentChanged
+    ? "Đã cập nhật. Bài quay về trạng thái chờ duyệt."
+    : req.body?.status !== undefined
+    ? "Đã cập nhật trạng thái bài."
+    : "Đã cập nhật.";
+
+  return ok(res, { post, message });
 });
 
 const remove = asyncHandler(async (req, res) => {

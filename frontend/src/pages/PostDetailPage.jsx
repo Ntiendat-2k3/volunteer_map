@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { postApi } from "../services/postApi";
 import { useAuth } from "../contexts/AuthContext";
-import { FiPhoneCall } from "react-icons/fi";
+import { FiEdit2, FiPhoneCall, FiXCircle, FiCheckCircle } from "react-icons/fi";
 
 export default function PostDetailPage() {
   const { id } = useParams();
@@ -12,6 +12,7 @@ export default function PostDetailPage() {
   const { user } = useAuth();
 
   const [post, setPost] = useState(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -30,7 +31,44 @@ export default function PostDetailPage() {
 
   if (!post) return null;
 
+  const isOwner = !!user && Number(user.id) === Number(post.userId);
+
+  // ✅ chỉ cho toggle khi bài đã được duyệt
+  const canToggleClosed = isOwner && post.approvalStatus === "APPROVED";
+
   const gg = `https://www.google.com/maps?q=${post.lat},${post.lng}`;
+
+  const toggleClosed = async () => {
+    if (!isOwner) return;
+
+    if (post.approvalStatus !== "APPROVED") {
+      toast.error("Chỉ có thể báo đã đủ khi bài đã được duyệt (APPROVED).");
+      return;
+    }
+
+    const next = post.status === "OPEN" ? "CLOSED" : "OPEN";
+    const okConfirm = window.confirm(
+      next === "CLOSED"
+        ? "Xác nhận đóng nhận hỗ trợ (CLOSED)?"
+        : "Xác nhận mở lại nhận hỗ trợ (OPEN)?"
+    );
+    if (!okConfirm) return;
+
+    setBusy(true);
+    try {
+      const res = await postApi.update(id, { status: next });
+      setPost(res.data.data.post);
+      toast.success(
+        next === "CLOSED" ? "Đã báo đã đủ ✅" : "Đã mở lại nhận hỗ trợ ✅"
+      );
+    } catch (e) {
+      toast.error(
+        e?.response?.data?.message || "Không cập nhật được trạng thái"
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="container-app py-8">
@@ -61,6 +99,48 @@ export default function PostDetailPage() {
             )}
 
             <div className="divider" />
+
+            {(isOwner || user?.role === "ADMIN") && (
+              <div className="mb-6 flex flex-wrap gap-2">
+                {isOwner && (
+                  <>
+                    <Link
+                      to={`/posts/${post.id}/edit`}
+                      className="btn btn-outline"
+                    >
+                      <FiEdit2 /> Sửa bài
+                    </Link>
+
+                    {/* ✅ chỉ hiện nút báo đã đủ khi APPROVED */}
+                    {canToggleClosed && (
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        disabled={busy}
+                        onClick={toggleClosed}
+                      >
+                        {post.status === "OPEN" ? (
+                          <>
+                            <FiXCircle /> Báo đã đủ (CLOSED)
+                          </>
+                        ) : (
+                          <>
+                            <FiCheckCircle /> Mở lại (OPEN)
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {/* (tuỳ chọn) hint cho user nếu chưa APPROVED */}
+                    {!canToggleClosed && post.approvalStatus !== "APPROVED" && (
+                      <div className="text-sm text-slate-600 flex items-center">
+                        Bài chưa duyệt nên chưa thể “Báo đã đủ”.
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
 
             <div>
               <div className="text-sm font-semibold text-slate-700">

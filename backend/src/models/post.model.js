@@ -64,6 +64,8 @@ function definePost(sequelize) {
     },
     {
       tableName: "posts",
+      paranoid: true,
+      deletedAt: "deleted_at",
       underscored: true,
     }
   );
