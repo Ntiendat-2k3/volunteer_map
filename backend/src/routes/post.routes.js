@@ -6,12 +6,16 @@ const {
   requirePostOwnerOrAdmin,
 } = require("../middlewares/requirePostOwnerOrAdmin");
 const postController = require("../controllers/post.controller");
+const supportCommitRoutes = require("./supportCommit.routes");
 
 // Public list (chỉ APPROVED)
 router.get("/", postController.list);
 
 // My posts (all statuses)
 router.get("/mine", requireAuth, postController.mine);
+
+// ✅ Support commits nested
+router.use("/:id/support-commits", loadPost, supportCommitRoutes);
 
 // Detail: optional auth để owner xem bài PENDING
 router.get("/:id", optionalAuth, loadPost, postController.getById);

@@ -8,6 +8,7 @@ import {
   FiPlus,
   FiMapPin,
   FiGrid,
+  FiUsers,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -60,6 +61,12 @@ export default function Navbar() {
               <NavLink to="/posts/mine" className={navClass}>
                 <span className="inline-flex items-center gap-2">
                   <FiGrid /> Bài của tôi
+                </span>
+              </NavLink>
+
+              <NavLink to="/support-management" className={navClass}>
+                <span className="inline-flex items-center gap-2">
+                  <FiUsers /> Quản lý hỗ trợ
                 </span>
               </NavLink>
 

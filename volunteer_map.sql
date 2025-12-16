@@ -74,3 +74,27 @@ CREATE TRIGGER trg_posts_updated_at
 BEFORE UPDATE ON posts
 FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+-- 1) Table: support_commits
+CREATE TABLE IF NOT EXISTS support_commits (
+  id SERIAL PRIMARY KEY,
+  post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+  quantity INTEGER NOT NULL DEFAULT 1,
+  message TEXT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING | CONFIRMED | CANCELED
+
+  confirmed_at TIMESTAMPTZ NULL,
+  canceled_at TIMESTAMPTZ NULL,
+
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 2) One user only commit once per post (update nếu commit lại)
+CREATE UNIQUE INDEX IF NOT EXISTS uq_support_commits_post_user
+ON support_commits (post_id, user_id);
+
+-- 3) Helpful indexes
+CREATE INDEX IF NOT EXISTS idx_support_commits_post ON support_commits(post_id);
+CREATE INDEX IF NOT EXISTS idx_support_commits_user ON support_commits(user_id);

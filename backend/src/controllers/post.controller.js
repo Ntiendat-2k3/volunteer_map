@@ -2,6 +2,7 @@ const { asyncHandler } = require("../middlewares/asyncHandler");
 const { ok, created } = require("../utils/response");
 const { ApiError } = require("../utils/apiError");
 const postService = require("../services/post.service");
+const supportCommitService = require("../services/supportCommit.service");
 
 const create = asyncHandler(async (req, res) => {
   const post = await postService.createPost(req.user.id, req.body);
@@ -21,7 +22,6 @@ const mine = asyncHandler(async (req, res) => {
 const getById = asyncHandler(async (req, res) => {
   const post = req.post;
 
-  // Public chỉ xem APPROVED. Nếu chưa duyệt -> phải là owner/admin mới xem được
   if (post.approvalStatus !== "APPROVED") {
     if (!req.user) throw ApiError.unauthorized("Unauthorized");
     const isOwner = Number(post.userId) === Number(req.user.id);
@@ -29,8 +29,18 @@ const getById = asyncHandler(async (req, res) => {
     if (!isOwner && !isAdmin) throw ApiError.forbidden("Forbidden");
   }
 
-  const showContact = !!req.user; // ✅ chỉ login mới thấy số
-  return ok(res, { post: postService.sanitizePost(post, { showContact }) });
+  const showContact = !!req.user;
+
+  const supportSummary = await supportCommitService.getSummary({
+    postId: post.id,
+  });
+
+  return ok(res, {
+    post: {
+      ...postService.sanitizePost(post, { showContact }),
+      supportSummary,
+    },
+  });
 });
 
 const update = asyncHandler(async (req, res) => {

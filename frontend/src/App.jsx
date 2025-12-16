@@ -13,6 +13,7 @@ import PostDetailPage from "./pages/PostDetailPage";
 import EditPostPage from "./pages/EditPostPage";
 import MyPostsPage from "./pages/MyPostsPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import SupportManagementPage from "./pages/SupportManagementPage";
 
 export default function App() {
   return (
@@ -55,6 +56,14 @@ export default function App() {
               element={
                 <RequireAuth>
                   <AdminDashboardPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/support-management"
+              element={
+                <RequireAuth>
+                  <SupportManagementPage />
                 </RequireAuth>
               }
             />

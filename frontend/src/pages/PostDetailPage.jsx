@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { postApi } from "../services/postApi";
 import { useAuth } from "../contexts/AuthContext";
+import SupportCommitSection from "../components/support/SupportCommitSection";
 import { FiEdit2, FiPhoneCall, FiXCircle, FiCheckCircle } from "react-icons/fi";
 
 export default function PostDetailPage() {
@@ -15,13 +16,21 @@ export default function PostDetailPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    let alive = true;
+
     (async () => {
       const res = await postApi.get(id);
-      setPost(res.data.data.post);
+      const p = res.data.data.post;
+      if (!alive) return;
+      setPost(p);
     })().catch((e) => {
       toast.error(e?.response?.data?.message || "Không tải được bài");
       nav("/", { replace: true });
     });
+
+    return () => {
+      alive = false;
+    };
   }, [id, nav]);
 
   const center = useMemo(() => {
@@ -33,7 +42,7 @@ export default function PostDetailPage() {
 
   const isOwner = !!user && Number(user.id) === Number(post.userId);
 
-  // ✅ chỉ cho toggle khi bài đã được duyệt
+  // chỉ cho toggle khi bài đã được duyệt
   const canToggleClosed = isOwner && post.approvalStatus === "APPROVED";
 
   const gg = `https://www.google.com/maps?q=${post.lat},${post.lng}`;
@@ -58,9 +67,7 @@ export default function PostDetailPage() {
     try {
       const res = await postApi.update(id, { status: next });
       setPost(res.data.data.post);
-      toast.success(
-        next === "CLOSED" ? "Đã báo đã đủ ✅" : "Đã mở lại nhận hỗ trợ ✅"
-      );
+      toast.success(next === "CLOSED" ? "Đã báo đã đủ ✅" : "Đã mở lại ✅");
     } catch (e) {
       toast.error(
         e?.response?.data?.message || "Không cập nhật được trạng thái"
@@ -100,47 +107,43 @@ export default function PostDetailPage() {
 
             <div className="divider" />
 
-            {(isOwner || user?.role === "ADMIN") && (
+            {isOwner && (
               <div className="mb-6 flex flex-wrap gap-2">
-                {isOwner && (
-                  <>
-                    <Link
-                      to={`/posts/${post.id}/edit`}
-                      className="btn btn-outline"
-                    >
-                      <FiEdit2 /> Sửa bài
-                    </Link>
+                <Link to={`/posts/${post.id}/edit`} className="btn btn-outline">
+                  <FiEdit2 /> Sửa bài
+                </Link>
 
-                    {/* ✅ chỉ hiện nút báo đã đủ khi APPROVED */}
-                    {canToggleClosed && (
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        disabled={busy}
-                        onClick={toggleClosed}
-                      >
-                        {post.status === "OPEN" ? (
-                          <>
-                            <FiXCircle /> Báo đã đủ (CLOSED)
-                          </>
-                        ) : (
-                          <>
-                            <FiCheckCircle /> Mở lại (OPEN)
-                          </>
-                        )}
-                      </button>
+                {canToggleClosed && (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={busy}
+                    onClick={toggleClosed}
+                  >
+                    {post.status === "OPEN" ? (
+                      <>
+                        <FiXCircle /> Báo đã đủ (CLOSED)
+                      </>
+                    ) : (
+                      <>
+                        <FiCheckCircle /> Mở lại (OPEN)
+                      </>
                     )}
+                  </button>
+                )}
 
-                    {/* (tuỳ chọn) hint cho user nếu chưa APPROVED */}
-                    {!canToggleClosed && post.approvalStatus !== "APPROVED" && (
-                      <div className="text-sm text-slate-600 flex items-center">
-                        Bài chưa duyệt nên chưa thể “Báo đã đủ”.
-                      </div>
-                    )}
-                  </>
+                {!canToggleClosed && post.approvalStatus !== "APPROVED" && (
+                  <div className="text-sm text-slate-600 flex items-center">
+                    Bài chưa duyệt nên chưa thể “Báo đã đủ”.
+                  </div>
                 )}
               </div>
             )}
+
+            {/* ✅ Support nằm ở đây (tự fetch summary/myCommit/list) */}
+            <SupportCommitSection post={post} />
+
+            <div className="divider" />
 
             <div>
               <div className="text-sm font-semibold text-slate-700">
