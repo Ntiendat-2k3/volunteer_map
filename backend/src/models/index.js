@@ -3,11 +3,13 @@ const { defineUser } = require("./user.model");
 const { defineRefreshToken } = require("./refreshToken.model");
 const { definePost } = require("./post.model");
 const { defineSupportCommit } = require("./supportCommit.model");
+const { definePostComment } = require("./postComment.model");
 
 const User = defineUser(sequelize);
 const RefreshToken = defineRefreshToken(sequelize);
 const Post = definePost(sequelize);
 const SupportCommit = defineSupportCommit(sequelize);
+const PostComment = definePostComment(sequelize);
 
 User.hasMany(RefreshToken, { foreignKey: "userId", as: "refreshTokens" });
 RefreshToken.belongsTo(User, { foreignKey: "userId", as: "user" });
@@ -22,4 +24,23 @@ SupportCommit.belongsTo(User, { foreignKey: "userId", as: "user" });
 Post.hasMany(SupportCommit, { foreignKey: "postId", as: "supportCommits" });
 SupportCommit.belongsTo(Post, { foreignKey: "postId", as: "post" });
 
-module.exports = { sequelize, User, RefreshToken, Post, SupportCommit };
+// Post - Comment
+Post.hasMany(PostComment, { foreignKey: "postId", as: "comments" });
+PostComment.belongsTo(Post, { foreignKey: "postId", as: "post" });
+
+// User - Comment
+User.hasMany(PostComment, { foreignKey: "userId", as: "comments" });
+PostComment.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+// Self reference (đa cấp)
+PostComment.hasMany(PostComment, { foreignKey: "parentId", as: "replies" });
+PostComment.belongsTo(PostComment, { foreignKey: "parentId", as: "parent" });
+
+module.exports = {
+  sequelize,
+  User,
+  RefreshToken,
+  Post,
+  SupportCommit,
+  PostComment,
+};

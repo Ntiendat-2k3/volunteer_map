@@ -84,13 +84,13 @@ export default function MyPostsPage() {
 
                     <div className="flex flex-wrap gap-2">
                       <Link to={`/posts/${p.id}`} className="btn btn-outline">
-                        <FiEye /> Xem
+                        <FiEye />
                       </Link>
                       <Link
                         to={`/posts/${p.id}/edit`}
                         className="btn btn-outline"
                       >
-                        <FiEdit2 /> Sửa
+                        <FiEdit2 />
                       </Link>
                       <button
                         type="button"
@@ -99,11 +99,11 @@ export default function MyPostsPage() {
                       >
                         {p.status === "OPEN" ? (
                           <>
-                            <FiXCircle /> Đóng
+                            <FiXCircle /> Đóng dự án
                           </>
                         ) : (
                           <>
-                            <FiCheckCircle /> Mở
+                            <FiCheckCircle /> Mở dự án
                           </>
                         )}
                       </button>

@@ -6,6 +6,7 @@ const {
 } = require("../middlewares/requirePostOwnerOrAdmin");
 const ctrl = require("../controllers/supportCommit.controller");
 
+router.get("/public", ctrl.publicList);
 router.get("/summary", ctrl.summary);
 
 router.get("/mine", requireAuth, ctrl.myForPost);
@@ -19,8 +20,6 @@ router.patch(
   requirePostOwnerOrAdmin,
   ctrl.confirm
 );
-
-// người tạo commit OR owner/admin được huỷ (service check quyền)
 router.patch("/:commitId/cancel", requireAuth, ctrl.cancel);
 
 module.exports = router;

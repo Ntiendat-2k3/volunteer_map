@@ -57,6 +57,16 @@ const cancel = asyncHandler(async (req, res) => {
   return ok(res, { commit, message: "Đã huỷ" });
 });
 
+const publicList = asyncHandler(async (req, res) => {
+  const postId = Number(req.post.id);
+  const limit = req.query.limit; // optional
+  const data = await supportCommitService.listPublicConfirmedForPost({
+    postId,
+    limit,
+  });
+  return ok(res, data);
+});
+
 module.exports = {
   summary,
   myForPost,
@@ -64,4 +74,5 @@ module.exports = {
   listForPost,
   confirm,
   cancel,
+  publicList,
 };

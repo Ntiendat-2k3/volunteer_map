@@ -257,10 +257,6 @@ export default function CreatePostPage() {
                 />
               </MapContainer>
             </div>
-
-            <div className="mt-3 text-xs text-slate-500">
-              Click map sẽ tự reverse để ra địa chỉ gần đúng nhất.
-            </div>
           </div>
         </div>
       </div>

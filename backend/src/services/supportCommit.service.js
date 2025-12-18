@@ -33,6 +33,18 @@ function sanitizeCommit(c) {
   };
 }
 
+function sanitizePublicCommit(c) {
+  const json = c.toJSON ? c.toJSON() : c;
+  return {
+    id: json.id,
+    user: json.user
+      ? { id: json.user.id, name: json.user.name, email: json.user.email }
+      : null,
+    message: json.message ?? null,
+    createdAt: json.createdAt,
+  };
+}
+
 function assertPostAcceptsCommit(post) {
   if (!post) throw ApiError.notFound("Post not found");
   if (post.approvalStatus !== "APPROVED") {
@@ -244,6 +256,19 @@ async function getSummary({ postId }) {
   };
 }
 
+async function listPublicConfirmedForPost({ postId, limit }) {
+  const n = Number(limit);
+  const lim = Number.isFinite(n) && n > 0 ? Math.min(n, 500) : 6;
+
+  const rows = await SupportCommit.findAll({
+    where: { postId, status: "CONFIRMED" },
+    include: [{ model: User, as: "user", attributes: ["id", "name", "email"] }],
+    order: [["createdAt", "DESC"]],
+    limit: lim,
+  });
+  return { items: rows.map(sanitizePublicCommit) };
+}
+
 module.exports = {
   createOrUpdateMyCommit,
   getMyCommitForPost,
@@ -251,4 +276,5 @@ module.exports = {
   confirmCommit,
   cancelCommit,
   getSummary,
+  listPublicConfirmedForPost,
 };

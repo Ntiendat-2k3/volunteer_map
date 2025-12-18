@@ -16,4 +16,9 @@ export const supportCommitApi = {
 
   cancel: (postId, commitId) =>
     http.patch(`/posts/${postId}/support-commits/${commitId}/cancel`),
+
+  publicList: (postId, limit) =>
+    http.get(
+      `/posts/${postId}/support-commits/public${limit ? `?limit=${limit}` : ""}`
+    ),
 };

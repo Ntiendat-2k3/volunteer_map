@@ -7,12 +7,15 @@ const {
 } = require("../middlewares/requirePostOwnerOrAdmin");
 const postController = require("../controllers/post.controller");
 const supportCommitRoutes = require("./supportCommit.routes");
+const commentRoutes = require("./comment.routes");
 
 // Public list (chỉ APPROVED)
 router.get("/", postController.list);
 
 // My posts (all statuses)
 router.get("/mine", requireAuth, postController.mine);
+
+router.use("/:id/comments", optionalAuth, loadPost, commentRoutes);
 
 // ✅ Support commits nested
 router.use("/:id/support-commits", loadPost, supportCommitRoutes);

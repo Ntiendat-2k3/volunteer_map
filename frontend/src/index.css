@@ -17,7 +17,7 @@
   .container-app {
     max-width: 72rem;
     margin-inline: auto;
-    padding-inline: 1rem;
+    padding-inline: 0.6rem;
   }
 
   /* Auth layout */
@@ -277,4 +277,42 @@
     font-weight: 800;
     color: rgb(51 65 85);
   }
+}
+
+input {
+  outline: none;
+}
+
+.aurora-blob {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  filter: blur(40px);
+  border-radius: 9999px;
+  opacity: 0.55;
+  transform: translateZ(0);
+}
+.aurora-blob-1 {
+  left: -120px;
+  top: -140px;
+  background: radial-gradient(circle at 30% 30%, #60a5fa, transparent 60%);
+}
+.aurora-blob-2 {
+  right: -160px;
+  top: 80px;
+  background: radial-gradient(circle at 30% 30%, #a78bfa, transparent 60%);
+}
+.aurora-blob-3 {
+  left: 20%;
+  bottom: -200px;
+  background: radial-gradient(circle at 30% 30%, #34d399, transparent 60%);
+}
+
+/* Leaflet: bo tròn control cho hợp style */
+.leaflet-control-zoom a {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+.leaflet-container {
+  font-family: inherit;
 }
